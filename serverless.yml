@@ -1,0 +1,182 @@
+service: teamweb
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  environment:
+    TEAM_TABLE: ${self:service}-team-${opt:stage, self:provider.stage}
+    # USERTEAM_TABLE: ${self:service}-userteam-${opt:stage, self:provider.stage}
+    # COGNITOUSER_TABLE: ${self:service}-cognitouser-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TEAM_TABLE}"
+    # - Effect: Allow
+    #   Action:
+    #     - dynamodb:Query
+    #     - dynamodb:Scan
+    #     - dynamodb:GetItem
+    #     - dynamodb:PutItem
+    #     - dynamodb:UpdateItem
+    #     - dynamodb:DeleteItem
+    #   Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USERTEAM_TABLE}"
+    # - Effect: Allow
+    #   Action:
+    #     - dynamodb:Query
+    #     - dynamodb:Scan
+    #     - dynamodb:GetItem
+    #     - dynamodb:PutItem
+    #     - dynamodb:UpdateItem
+    #     - dynamodb:DeleteItem
+    #   Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.COGNITOUSER_TABLE}"
+functions:
+  teamcreate:
+    handler: team/create.create
+    events:
+      - http:
+          path: team
+          method: post
+          cors: true
+  # teambatchget:
+  #   handler: team/batchget.batchget
+  #   events:
+  #     - http:
+  #         path: team
+  #         method: get
+  #         cors: true
+  # teamget:
+  #   handler: team/get.get
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: get
+  #         cors: true
+  # teamupdate:
+  #   handler: team/update.update
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: put
+  #         cors: true
+  # teamdelete:
+  #   handler: team/delete.delete
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: delete
+  #         cors: true
+  # teamplayercreate:
+  #   handler: team/create.create
+  #   events:
+  #     - http:
+  #         path: team
+  #         method: post
+  #         cors: true
+  # teamplayerbatchget:
+  #   handler: team/batchget.batchget
+  #   events:
+  #     - http:
+  #         path: team
+  #         method: get
+  #         cors: true
+  # teamplayerbatchupdate:
+  #   handler: team/update.update
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: put
+  #         cors: true
+  # teamplayerdelete:
+  #   handler: team/delete.delete
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: delete
+  #         cors: true
+  # usercreate:
+  #   handler: team/create.create
+  #   events:
+  #     - http:
+  #         path: team
+  #         method: post
+  #         cors: true
+  # userget:
+  #   handler: team/batchget.batchget
+  #   events:
+  #     - http:
+  #         path: team
+  #         method: get
+  #         cors: true
+  # userbatchget:
+  #   handler: team/update.update
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: put
+  #         cors: true
+  # userdelete:
+  #   handler: team/delete.delete
+  #   events:
+  #     - http:
+  #         path: team/{id}
+  #         method: delete
+  #         cors: true
+
+resources:
+  Resources:
+    TeamDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TEAM_TABLE}
+    # UserTeamDynamoDbTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: id
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.USERTEAM_TABLE}
+    # CognitoUserTeamDynamoDbTable:
+    #   Type: 'AWS::DynamoDB::Table'
+    #   DeletionPolicy: Retain
+    #   Properties:
+    #     AttributeDefinitions:
+    #       -
+    #         AttributeName: id
+    #         AttributeType: S
+    #     KeySchema:
+    #       -
+    #         AttributeName: id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 1
+    #       WriteCapacityUnits: 1
+    #     TableName: ${self:provider.environment.COGNITOUSER_TABLE}
